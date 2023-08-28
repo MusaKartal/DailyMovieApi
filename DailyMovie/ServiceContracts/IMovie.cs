@@ -5,7 +5,7 @@ namespace DailyMovie.ServiceContracts
     public interface IMovie
     {
 
-        public Task RenderUrlAndSaveAsync();
+        //public Task RenderUrlAndSaveAsync();
         public Task<Movie> GetRandomMovie();
 
         public Task MovieIsViewedUpdate(int movieId);

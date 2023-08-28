@@ -22,18 +22,14 @@ namespace DailyMovie.Controllers
         {
             var movie = _movieService.GetRandomMovie();
 
-            return Ok(movie);
-        }
-
-        [HttpPost]
-        [Route("RenderUrlAndSave")]
-        public IActionResult RenderUrlAndSaveAsync()
-        {
-            var movie = _movieService.RenderUrlAndSaveAsync();
+            if (movie == null)
+            {
+                return NotFound("No recommendations available.");
+            }
 
             return Ok(movie);
         }
-
+        
         [HttpGet]
         [Route("LastMovies")]
         public IActionResult GetLatestMovies()

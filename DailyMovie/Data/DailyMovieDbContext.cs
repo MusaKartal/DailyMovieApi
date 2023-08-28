@@ -12,8 +12,7 @@ namespace DailyMovie.Data
         }
 
         public DbSet<Movie> Movies { get; set; }
-        public DbSet<MovieUrl> MovieUrls { get; set; }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

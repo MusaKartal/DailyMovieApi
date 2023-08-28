@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DailyMovie.Migrations
 {
     [DbContext(typeof(DailyMovieDbContext))]
-    [Migration("20230822135119_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20230828122058_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,6 @@ namespace DailyMovie.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Genres")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image")
@@ -52,12 +51,18 @@ namespace DailyMovie.Migrations
                     b.Property<bool>("IsViewed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Score")
+                    b.Property<string>("MovieId")
                         .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PullDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Score")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Time")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
@@ -66,37 +71,6 @@ namespace DailyMovie.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Trailer")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("DailyMovie.Entities.MovieUrl", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsProcessed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("MovieId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ProcessingDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("PullDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
@@ -106,7 +80,7 @@ namespace DailyMovie.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MovieUrls");
+                    b.ToTable("Movies");
                 });
 #pragma warning restore 612, 618
         }

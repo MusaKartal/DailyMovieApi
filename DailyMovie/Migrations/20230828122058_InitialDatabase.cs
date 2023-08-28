@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DailyMovie.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,33 +22,18 @@ namespace DailyMovie.Migrations
                     Date = table.Column<string>(type: "TEXT", nullable: false),
                     FullDate = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    Score = table.Column<string>(type: "TEXT", nullable: false),
-                    Trailer = table.Column<string>(type: "TEXT", nullable: false),
-                    Time = table.Column<string>(type: "TEXT", nullable: false),
-                    Genres = table.Column<string>(type: "TEXT", nullable: false),
+                    PullDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    MovieId = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Score = table.Column<string>(type: "TEXT", nullable: true),
+                    Trailer = table.Column<string>(type: "TEXT", nullable: true),
+                    Time = table.Column<string>(type: "TEXT", nullable: true),
+                    Genres = table.Column<string>(type: "TEXT", nullable: true),
                     IsViewed = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MovieUrls",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    PullDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    MovieId = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    ProcessingDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsProcessed = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MovieUrls", x => x.Id);
                 });
         }
 
@@ -57,9 +42,6 @@ namespace DailyMovie.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Movies");
-
-            migrationBuilder.DropTable(
-                name: "MovieUrls");
         }
     }
 }

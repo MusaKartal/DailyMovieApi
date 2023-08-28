@@ -7,8 +7,8 @@ namespace DailyMovie.Entities
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Film title is required.")]
-        [StringLength(100, ErrorMessage = "Film title can have a maximum of 100 characters.")]
+        [Required(ErrorMessage = "Movie title is required.")]
+        [StringLength(100, ErrorMessage = "Movie title can have a maximum of 100 characters.")]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Image is required.")]
@@ -26,15 +26,26 @@ namespace DailyMovie.Entities
         [StringLength(500, ErrorMessage = "Description can have a maximum of 500 characters.")]
         public string Description { get; set; }
 
-        public string Score { get; set; }
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime PullDate { get; set; }
 
-        public string Trailer { get; set; }
+        [Required]
+        [StringLength(500)]
+        [Url]
+        public string Url { get; set; }
 
-        public string Time { get; set; }
+        [StringLength(200)]
+        public string MovieId { get; set; }
+     
+        public string? Score { get; set; }
 
-        public string Genres { get; set; }
+        public string? Trailer { get; set; }
 
+        public string? Time { get; set; }
 
+        public string? Genres { get; set; }
+      
         public bool IsViewed { get; set; }
     }
 }

@@ -1,7 +1,10 @@
-using DailyMovie.Data;
+﻿using DailyMovie.Data;
+using DailyMovie.Extensions;
+using DailyMovie.FetchBackgroundService;
 using DailyMovie.ServiceContracts;
 using DailyMovie.Services;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +15,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DailyMovieDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
-builder.Services.AddTransient<IMovieUrlFetch, MovieUrlFetchService>();
-builder.Services.AddTransient<IMovie, MovieService>();
+builder.Services.AddDbContext<DailyMovieDbContext>(options => 
+options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<IMovieUrlFetch, MovieUrlFetchService>();
+
+builder.Services.AddScoped<IMovie, MovieService>();
+
+builder.Services.AddLogging(builder =>
+{
+    builder.AddConsole();
+    builder.AddDebug();
+});
+
+builder.Services.AddHostedService<MediaDataFetchingService>();
+
+builder.Services.AddHostedService<QueueService>();
 var app = builder.Build();
 
+app.ConfigureExceptionHandler();
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
