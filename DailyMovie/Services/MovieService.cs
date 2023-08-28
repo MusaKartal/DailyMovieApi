@@ -6,6 +6,7 @@ using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DailyMovie.Services
 {
@@ -25,10 +26,12 @@ namespace DailyMovie.Services
         public async Task<Movie> GetRandomMovie()
         {
 
-            if (_cache.TryGetValue("filmQueue", out List<Movie> filmQueue) && filmQueue.Any())
+
+            if (_cache.TryGetValue("movieQueue", out List<Movie> currentMovieQueue) && currentMovieQueue.Any())
             {
-                var index = _random.Next(filmQueue.Count);
-                var recommendedMovie = filmQueue[index];
+
+                var index = _random.Next(currentMovieQueue.Count);
+                var recommendedMovie = currentMovieQueue[index];
                 return recommendedMovie;
             }
 
@@ -38,24 +41,33 @@ namespace DailyMovie.Services
 
         public async Task MovieIsViewedUpdate(int movieId)
         {
-            Movie movie = _context.Movies.Where(i => i.IsViewed == false)
-                                          .FirstOrDefault(x => x.Id == movieId);
+            Movie movie = _context.Movies.FirstOrDefault(x => x.Id == movieId && !x.IsViewed);
 
             if (movie != null)
             {
+                movie.ViewedDate = DateTime.UtcNow;
                 movie.IsViewed = true;
                 _context.Movies.Update(movie);
                 await _context.SaveChangesAsync();
-            }
-         
 
+                // Cache güncellemesi
+                if (_cache.TryGetValue("movieQueue", out List<Movie> movieQueue))
+                {
+                    var movieToRemove = movieQueue.FirstOrDefault(m => m.Id == movie.Id);
+                    if (movieToRemove != null)
+                    {
+                        movieQueue.Remove(movieToRemove);
+                        _cache.Set("movieQueue", movieQueue, TimeSpan.FromDays(1));
+                    }
+                }
+            }
         }
 
         public List<Movie> LatestMovies()
         {
             List<Movie> lastMovie = _context.Movies
                                              .Where(x => x.IsViewed == true)
-                                             .OrderByDescending(x => x.Score)
+                                             .OrderByDescending(x => x.ViewedDate)
                                              .Take(5)
                                              .ToList();
             return lastMovie;

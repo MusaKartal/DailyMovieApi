@@ -45,7 +45,10 @@ namespace DailyMovie.Entities
         public string? Time { get; set; }
 
         public string? Genres { get; set; }
-      
+
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime ViewedDate { get; set; }
         public bool IsViewed { get; set; }
     }
 }

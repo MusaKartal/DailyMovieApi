@@ -3,6 +3,7 @@ using System;
 using DailyMovie.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DailyMovie.Migrations
 {
     [DbContext(typeof(DailyMovieDbContext))]
-    partial class DailyMovieDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230828163314_Movie_Add_ViewedDate")]
+    partial class Movie_Add_ViewedDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");

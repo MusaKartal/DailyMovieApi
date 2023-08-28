@@ -19,30 +19,40 @@ namespace DailyMovie.FetchBackgroundService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                
-
                 using (var scope = _services.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<DailyMovieDbContext>();
-                    List<Movie> films = dbContext.Movies.Where(x => !x.IsViewed).Take(20).ToList();
+                    var moviesToRecommend = dbContext.Movies
+                        .Where(movie => !movie.IsViewed)
+                        .Take(50)
+                        .ToList();
 
-                    foreach (var film in films)
+                    if (!_cache.TryGetValue("movieQueue", out List<Movie> movieQueue))
                     {
-                        _cache.TryGetValue("filmQueue", out List<Movie> filmQueue);
-                        if (filmQueue == null)
-                        {
-                            filmQueue = new List<Movie>();
-                        }
-
-                        filmQueue.Add(film);
-                        _cache.Set("filmQueue", filmQueue, TimeSpan.FromMinutes(10));
+                        movieQueue = new List<Movie>();
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
+                    // Yeni önerilen filmleri kuyruğa ekle (eğer zaten ekli değilse) ve görüntülenenleri kaldır
+                    foreach (var newMovie in moviesToRecommend)
+                    {
+                        if (!newMovie.IsViewed && !movieQueue.Any(movie => movie.Id == newMovie.Id))
+                        {
+                            movieQueue.Add(newMovie);
+                        }
+                    }
+
+                    // Kuyruktaki filmlerden geçmişte görüntülenenleri kaldır
+                    movieQueue.RemoveAll(movie => dbContext.Movies.Any(dbMovie => dbMovie.Id == movie.Id && dbMovie.IsViewed));
+
+                    _cache.Set("movieQueue", movieQueue, TimeSpan.FromSeconds(2));
+
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
             }
+            
         }
     }
 }
