@@ -30,7 +30,7 @@ namespace DailyMovie.Services
         {
 
 
-            if (_cache.TryGetValue("movieQueu", out List<Movie> currentMovieQueue) && currentMovieQueue.Any())
+            if (_cache.TryGetValue("movieQueue", out List<Movie> currentMovieQueue) && currentMovieQueue.Any())
             {
                 var index = _random.Next(currentMovieQueue.Count);
                 var recommendedMovie = currentMovieQueue[index];
