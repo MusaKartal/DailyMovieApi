@@ -24,6 +24,9 @@ builder.Services.AddScoped<IMovieUrlFetch, MovieUrlFetchService>();
 
 builder.Services.AddScoped<IMovie, MovieService>();
 
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddLogging(builder =>
 {
     builder.AddConsole();

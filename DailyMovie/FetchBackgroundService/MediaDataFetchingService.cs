@@ -33,7 +33,7 @@ namespace DailyMovie.FetchBackgroundService
 
                 }
                 _logger.LogInformation("Movies data database processed");
-                await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
     }

@@ -1,12 +1,14 @@
-﻿using DailyMovie.Data;
+﻿using AutoMapper;
+using DailyMovie.Data;
 using DailyMovie.DTO;
 using DailyMovie.Entities;
+using DailyMovie.ErrorModel;
 using DailyMovie.ServiceContracts;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace DailyMovie.Services
 {
@@ -15,27 +17,34 @@ namespace DailyMovie.Services
         private readonly DailyMovieDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly Random _random = new Random();
-        public MovieService(DailyMovieDbContext context, IMemoryCache cache)
+        private readonly IMapper _mapper;
+        public MovieService(DailyMovieDbContext context, IMemoryCache cache, IMapper mapper)
         {
             _context = context;
             _cache = cache;
-
+            _mapper = mapper;
         }
 
 
-        public async Task<Movie> GetRandomMovie()
+        public async Task<MovieDetailDto> GetRandomMovie()
         {
 
 
-            if (_cache.TryGetValue("movieQueue", out List<Movie> currentMovieQueue) && currentMovieQueue.Any())
+            if (_cache.TryGetValue("movieQueu", out List<Movie> currentMovieQueue) && currentMovieQueue.Any())
             {
-
                 var index = _random.Next(currentMovieQueue.Count);
                 var recommendedMovie = currentMovieQueue[index];
-                return recommendedMovie;
+                var movieDetailDto = _mapper.Map<MovieDetailDto>(recommendedMovie);
+                return movieDetailDto;
             }
-
-            return null;
+          
+            Movie firstUnviewedMovie = _context.Movies.FirstOrDefault(m => m.IsViewed == false);
+            var movieDetail = _mapper.Map<MovieDetailDto>(firstUnviewedMovie);
+            if (firstUnviewedMovie == null)
+            {
+                throw new KeyNotFoundException("Movie not found");
+            }
+            return movieDetail;
 
         }
 
@@ -59,18 +68,33 @@ namespace DailyMovie.Services
                         movieQueue.Remove(movieToRemove);
                         _cache.Set("movieQueue", movieQueue, TimeSpan.FromDays(1));
                     }
+                    else
+                    {
+                        throw new KeyNotFoundException("cache is empty so couldn't update");
+                    }
                 }
+                else
+                {
+                    throw new SomeException("Movie cache value not found");
+                }
+
             }
         }
 
-        public List<Movie> LatestMovies()
+        public List<MovieDetailDto> LatestMovies()
         {
             List<Movie> lastMovie = _context.Movies
                                              .Where(x => x.IsViewed == true)
                                              .OrderByDescending(x => x.ViewedDate)
                                              .Take(5)
                                              .ToList();
-            return lastMovie;
+            var movieDetails = _mapper.Map<List<MovieDetailDto>>(lastMovie);
+            if (movieDetails == null)
+            {
+                throw new KeyNotFoundException("No movies viewed");
+            }
+
+            return movieDetails;
         }
 
         #region

@@ -8,13 +8,14 @@ namespace DailyMovie.FetchBackgroundService
 {
     public class QueueService : BackgroundService
     {
+        private readonly ILogger<MediaDataFetchingService> _logger;
         private readonly IServiceProvider _services;
         private readonly IMemoryCache _cache;
-        public QueueService(IServiceProvider services, IMemoryCache cache)
+        public QueueService(IServiceProvider services, IMemoryCache cache, ILogger<MediaDataFetchingService> logger)
         {
             _services = services;
             _cache = cache;
-         
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,6 +23,7 @@ namespace DailyMovie.FetchBackgroundService
 
             while (!stoppingToken.IsCancellationRequested)
             {
+                _logger.LogInformation("Cache process started");
                 using (var scope = _services.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<DailyMovieDbContext>();
@@ -47,9 +49,9 @@ namespace DailyMovie.FetchBackgroundService
                     // Kuyruktaki filmlerden geçmişte görüntülenenleri kaldır
                     movieQueue.RemoveAll(movie => dbContext.Movies.Any(dbMovie => dbMovie.Id == movie.Id && dbMovie.IsViewed));
 
-                    _cache.Set("movieQueue", movieQueue, TimeSpan.FromSeconds(2));
-
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    _cache.Set("movieQueue", movieQueue);
+                    _logger.LogInformation("Movie added to cache");
+                    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
                 }
             }
             

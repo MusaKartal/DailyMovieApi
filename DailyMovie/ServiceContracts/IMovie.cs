@@ -1,4 +1,5 @@
-﻿using DailyMovie.Entities;
+﻿using DailyMovie.DTO;
+using DailyMovie.Entities;
 
 namespace DailyMovie.ServiceContracts
 {
@@ -6,11 +7,11 @@ namespace DailyMovie.ServiceContracts
     {
 
         //public Task RenderUrlAndSaveAsync();
-        public Task<Movie> GetRandomMovie();
+        public Task<MovieDetailDto> GetRandomMovie();
 
         public Task MovieIsViewedUpdate(int movieId);
 
-        public List<Movie> LatestMovies();
+        public List<MovieDetailDto> LatestMovies();
 
         
     }
